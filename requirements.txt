@@ -1,0 +1,9 @@
+flask==3.1.0
+gunicorn==23.0.0
+sqlalchemy==2.0.39
+celery==5.4.0
+requests==2.32.3
+pandas==2.2.3
+Redis==5.2.1
+alembic==1.15.1
+psycopg2-binary==2.9.10

@@ -1,0 +1,42 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    command: "gunicorn -w 4 'app:app' --bind=0.0.0.0"
+    stdin_open: true
+    tty: true
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./:/var/btc
+    environment:
+      - COINGECKO_API_KEY=$COINGECKO_API_KEY
+      - SQLALCHEMY_DATABASE_URI=postgresql://btc@postgres:5432/btc
+      - REDIS_URL=redis://redis:6379
+  tasks:
+    build:
+      context: .
+      dockerfile: Dockerfile.tasks
+    command: /usr/bin/supervisord -c /var/btc/btc/supervisord.conf
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./:/var/btc
+    environment:
+      - COINGECKO_API_KEY=$COINGECKO_API_KEY
+      - SQLALCHEMY_DATABASE_URI=postgresql://btc@postgres:5432/btc
+      - REDIS_URL=redis://redis:6379
+  redis:
+    image: redis:5-alpine
+  postgres:
+    image: postgres:9.6
+    volumes:
+      - btc_postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_USER=btc
+volumes:
+  btc_postgres:
+    name: btc_postgres
+    external: true
